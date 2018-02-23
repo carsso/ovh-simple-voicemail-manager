@@ -5,6 +5,16 @@ This project is a simple OVH voicemail manager to manage your messages and liste
 
 _Depends on my project OVH API HTTP wrapper written in PHP : https://github.com/carsso/ovh-api-simple-http-wrapper_
 
+
+Screenshots:
+
+Lines view:
+![Lines view](https://user-images.githubusercontent.com/666182/36616603-aaf32398-18e4-11e8-8132-d4a52221c583.png)
+
+Messages view:
+![Messages view](https://user-images.githubusercontent.com/666182/36616602-aaa990d4-18e4-11e8-8a2b-0eef3d51b337.png)
+
+
 How to use
 ----------
 
