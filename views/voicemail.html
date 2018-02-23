@@ -1,0 +1,41 @@
+<a href="/voicemail/"><i class="fas fa-arrow-alt-circle-left"></i> Lines</a>
+<h1>{{service.description || service.billingAccount}}</h1>
+<tabs>
+    <pane title="{{voicemail.description}} ({{voicemail.serviceName | tel}})" ng-repeat="voicemail in service.voicemails">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Caller</th>
+                    <th scope="col">Duration</th>
+                    <th scope="col" colspan="2">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="message in voicemail.messages" rel="message{{message.id}}">
+                    <th scope="row">{{message.id}}</th>
+                    <td>{{message.creationDatetime | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td>{{message.caller | tel }}</td>
+                    <td>{{message.duration}}s</td>
+                    <td>
+                        <span ng-if="message.download && message.download.status && message.download.status != 'done'">
+                            <i class="fas fa-exclamation-circle"></i> An error has occured !
+                        </span>
+                        <span ng-if="!message.download || !message.download.status">
+                            <i class="fas fa-circle-notch fa-spin"></i> Loading...
+                        </span>
+                        <audio controls="controls" ng-if="message.download && message.download.status && message.download.status == 'done'">
+                            <source src="{{message.download.url}}" type="audio/mp3" />
+                        </audio>
+                    </td>
+                    <td>
+                        <a href="" ng-click="deleteMessage(service.billingAccount, voicemail.serviceName, message.id)" class="btn btn-sm btn-outline-danger" ng-if="message.download && message.download.status && message.download.status == 'done'">
+                            <i class="fas fa-trash"></i> 
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </pane>
+</tabs>
