@@ -32,12 +32,12 @@
                             </ng-container>
                             <ng-container ng-if="message.download.status">
                                 <ng-container ng-if="message.download.status == 'done'">
-                                    <ng-container ng-if="message.download.audio.paused">
+                                    <ng-container ng-if="message.download.audio.paused || message.download.audio.ended">
                                         <button ng-click="playMessage(service.billingAccount, voicemail.serviceName, message.id)" class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-play"></i>
                                         </button>
                                     </ng-container>
-                                    <ng-container ng-if="!message.download.audio.paused">
+                                    <ng-container ng-if="!(message.download.audio.paused || message.download.audio.ended)">
                                         <button ng-click="stopMessage(service.billingAccount, voicemail.serviceName, message.id)" class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-stop"></i>
                                         </button>
