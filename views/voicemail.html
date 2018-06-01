@@ -9,7 +9,7 @@
                     <th scope="col">Date</th>
                     <th scope="col">Caller</th>
                     <th scope="col">Duration</th>
-                    <th scope="col" colspan="2">Actions</th>
+                    <th scope="col">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -19,20 +19,43 @@
                     <td>{{message.caller | tel }}</td>
                     <td>{{message.duration}}s</td>
                     <td>
-                        <span ng-if="message.download && message.download.status && message.download.status != 'done'">
-                            <i class="fas fa-exclamation-circle"></i> An error has occured !
-                        </span>
-                        <span ng-if="!message.download || !message.download.status">
-                            <i class="fas fa-circle-notch fa-spin"></i> Loading...
-                        </span>
-                        <audio controls="controls" ng-if="message.download && message.download.status && message.download.status == 'done'">
-                            <source src="{{message.download.url}}" type="audio/mp3" />
-                        </audio>
-                    </td>
-                    <td>
-                        <a href="" ng-click="deleteMessage(service.billingAccount, voicemail.serviceName, message.id)" class="btn btn-sm btn-outline-danger" ng-if="message.download && message.download.status && message.download.status == 'done'">
-                            <i class="fas fa-trash"></i> 
-                        </a>
+                        <ng-container ng-if="!message.download">
+                            <button ng-click="playMessage(service.billingAccount, voicemail.serviceName, message.id)" class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </ng-container>
+                        <ng-container ng-if="message.download">
+                            <ng-container ng-if="!message.download.status">
+                                <span class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-circle-notch fa-spin"></i>
+                                </span>
+                            </ng-container>
+                            <ng-container ng-if="message.download.status">
+                                <ng-container ng-if="message.download.status == 'done'">
+                                    <ng-container ng-if="message.download.audio.paused">
+                                        <button ng-click="playMessage(service.billingAccount, voicemail.serviceName, message.id)" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                    </ng-container>
+                                    <ng-container ng-if="!message.download.audio.paused">
+                                        <button ng-click="stopMessage(service.billingAccount, voicemail.serviceName, message.id)" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-stop"></i>
+                                        </button>
+                                    </ng-container>
+                                </ng-container>
+                                <ng-container ng-if="message.download.status != 'done'">
+                                    <span class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-exclamation-circle"></i> An error has occured !
+                                    </span>
+                                </ng-container>
+                            </ng-container>
+                        </ng-container>
+                        <button ng-click="downloadMessage(service.billingAccount, voicemail.serviceName, message.id)" class="btn btn-sm btn-outline-info">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button ng-click="deleteMessage(service.billingAccount, voicemail.serviceName, message.id)" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </td>
                 </tr>
             </tbody>

@@ -35,7 +35,6 @@ myApp.controller('VoicemailController', function($scope, $routeParams, $http) {
                 for (var i = 0; i < messages.length; i++) {
                     $scope.service['voicemails'][serviceName]['messages'][messages[i].key] = messages[i].value;
                     $scope.service['voicemails'][serviceName]['messages'][messages[i].key]['downloadCount'] = 10;
-                    $scope.getMessageDownload(billingAccount, serviceName, messages[i].key);
                 }
             }, function errorCallback(response) {
                 console.error(response);
@@ -46,18 +45,60 @@ myApp.controller('VoicemailController', function($scope, $routeParams, $http) {
             alert('Error : '+response.data.message);
         });
     }
+    
+    $scope.playMessage = function(billingAccount, serviceName, messageId) {
+        if(!$scope.service['voicemails'][serviceName]['messages'][messageId].download) {
+            $scope.getMessageDownload(billingAccount, serviceName, messageId, 'play');
+            return true;
+        }
+        var audio = $scope.service['voicemails'][serviceName]['messages'][messageId].download.audio;
+        audio.pause();
+        audio.currentTime = 0;
+        audio.volume = 1;
+        audio.play();
+    }
+    
+    $scope.stopMessage = function(billingAccount, serviceName, messageId) {
+        if(!$scope.service['voicemails'][serviceName]['messages'][messageId].download) {
+            $scope.getMessageDownload(billingAccount, serviceName, messageId, 'stop');
+            return true;
+        }
+        var audio = $scope.service['voicemails'][serviceName]['messages'][messageId].download.audio;
+        audio.pause();
+        audio.currentTime = 0;
+    }
 
-    $scope.getMessageDownload = function(billingAccount, serviceName, messageId) {
+    $scope.downloadMessage = function(billingAccount, serviceName, messageId) {
+        if(!$scope.service['voicemails'][serviceName]['messages'][messageId].download) {
+            $scope.getMessageDownload(billingAccount, serviceName, messageId, 'download');
+            return true;
+        }
+        window.open($scope.service['voicemails'][serviceName]['messages'][messageId].download.url);
+        return true;
+    }
+
+    $scope.getMessageDownload = function(billingAccount, serviceName, messageId, action = null) {
+        $scope.service['voicemails'][serviceName]['messages'][messageId]['download'] = {};
         $http.get('/ovhapi/telephony/'+billingAccount+'/voicemail/'+serviceName+'/directories/'+messageId+'/download').then(function successCallback(response) {
             var messageDownload = response.data;
             if(messageDownload.status == 'done') {
+                messageDownload.audio = new Audio();
+                messageDownload.audio.src = messageDownload.url;
+                messageDownload.audio.load();
                 $scope.service['voicemails'][serviceName]['messages'][messageId]['download'] = messageDownload;
+                if(action == 'play') {
+                    $scope.playMessage(billingAccount, serviceName, messageId);
+                } else if(action == 'stop') {
+                    $scope.stopMessage(billingAccount, serviceName, messageId);
+                } else if(action == 'download') {
+                    $scope.downloadMessage(billingAccount, serviceName, messageId);
+                }
             } else if(messageDownload.status == 'todo' || messageDownload.status == 'doing') {
                 $scope.service['voicemails'][serviceName]['messages'][messageId]['downloadCount']--;
                 if($scope.service['voicemails'][serviceName]['messages'][messageId]['downloadCount'] > 0) {
                     setTimeout(function() {
                         console.log('Message '+messageId+' in '+messageDownload.status+', waiting a few and retrying');
-                        $scope.getMessageDownload(billingAccount, serviceName, messageId);
+                        $scope.getMessageDownload(billingAccount, serviceName, messageId, play);
                     }, 2000);
                 } else {
                     $scope.service['voicemails'][serviceName]['messages'][messageId]['download'] = messageDownload;
