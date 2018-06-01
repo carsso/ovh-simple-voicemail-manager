@@ -85,6 +85,9 @@ myApp.controller('VoicemailController', function($scope, $routeParams, $http) {
                 messageDownload.audio = new Audio();
                 messageDownload.audio.src = messageDownload.url;
                 messageDownload.audio.load();
+                messageDownload.audio.addEventListener('ended', function(){
+                    $scope.$apply();
+                });
                 $scope.service['voicemails'][serviceName]['messages'][messageId]['download'] = messageDownload;
                 if(action == 'play') {
                     $scope.playMessage(billingAccount, serviceName, messageId);
