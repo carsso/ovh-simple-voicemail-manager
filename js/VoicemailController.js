@@ -101,7 +101,7 @@ myApp.controller('VoicemailController', function($scope, $routeParams, $http) {
                 if($scope.service['voicemails'][serviceName]['messages'][messageId]['downloadCount'] > 0) {
                     setTimeout(function() {
                         console.log('Message '+messageId+' in '+messageDownload.status+', waiting a few and retrying');
-                        $scope.getMessageDownload(billingAccount, serviceName, messageId, play);
+                        $scope.getMessageDownload(billingAccount, serviceName, messageId, action);
                     }, 2000);
                 } else {
                     $scope.service['voicemails'][serviceName]['messages'][messageId]['download'] = messageDownload;
