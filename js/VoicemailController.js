@@ -17,14 +17,8 @@ myApp.controller('VoicemailController', function($scope, $routeParams, $http) {
                 $scope.service['voicemails'][serviceName] = voicemail;
                 $scope.service['voicemails'][serviceName]['messages'] = {};
                 loadMessages(billingAccount, serviceName);
-            }, function errorCallback(response) {
-                console.error(response);
-                alert('Error : '+response.data.message);
-            });
-        }, function errorCallback(response) {
-            console.error(response);
-            alert('Error : '+response.data.message);
-        });
+            }, $scope.handleHttpError);
+        }, $scope.handleHttpError);
     }
 
     function loadMessages(billingAccount, serviceName) {
@@ -36,14 +30,8 @@ myApp.controller('VoicemailController', function($scope, $routeParams, $http) {
                     $scope.service['voicemails'][serviceName]['messages'][messages[i].key] = messages[i].value;
                     $scope.service['voicemails'][serviceName]['messages'][messages[i].key]['downloadCount'] = 10;
                 }
-            }, function errorCallback(response) {
-                console.error(response);
-                alert('Error : '+response.data.message);
-            });
-        }, function errorCallback(response) {
-            console.error(response);
-            alert('Error : '+response.data.message);
-        });
+            }, $scope.handleHttpError);
+        }, $scope.handleHttpError);
     }
     
     $scope.playMessage = function(billingAccount, serviceName, messageId) {
@@ -109,10 +97,7 @@ myApp.controller('VoicemailController', function($scope, $routeParams, $http) {
             } else {
                 $scope.service['voicemails'][serviceName]['messages'][messageId]['download'] = messageDownload;
             }
-        }, function errorCallback(response) {
-            console.error(response);
-            alert('Error : '+response.data.message);
-        });
+        }, $scope.handleHttpError);
     }
     
     $scope.deleteMessage = function(billingAccount, serviceName, messageId) {
@@ -124,10 +109,18 @@ myApp.controller('VoicemailController', function($scope, $routeParams, $http) {
         {
             $http.delete('/ovhapi/telephony/'+billingAccount+'/voicemail/'+serviceName+'/directories/'+messageId).then(function successCallback(response) {
                 delete $scope.service['voicemails'][serviceName]['messages'][messageId];
-            }, function errorCallback(response) {
-                console.error(response);
+            }, $scope.handleHttpError);
+        }
+    }
+
+    $scope.handleHttpError = function (response) {
+        console.error(response);
+        if(response) {
+            if(response.data && response.data.message) {
                 alert('Error : '+response.data.message);
-            });
+            } else {
+                alert('Error : '+response.status+' '+response.statusText);
+            }
         }
     }
 
