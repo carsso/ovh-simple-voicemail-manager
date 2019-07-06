@@ -24,13 +24,20 @@ myApp.controller('VoicemailController', function($scope, $routeParams, $http) {
     function loadMessages(billingAccount, serviceName) {
         $http.get('/ovhapi/telephony/'+billingAccount+'/voicemail/'+serviceName+'/directories').then(function successCallback(response) {
             var messageIds = response.data;
-            $http.get('/ovhapi/telephony/'+billingAccount+'/voicemail/'+serviceName+'/directories/'+messageIds.join(','), {headers:{'X-OVH-BATCH':','}}).then(function successCallback(response) {
-                var messages = response.data;
-                for (var i = 0; i < messages.length; i++) {
-                    $scope.service['voicemails'][serviceName]['messages'][messages[i].key] = messages[i].value;
-                    $scope.service['voicemails'][serviceName]['messages'][messages[i].key]['downloadCount'] = 10;
-                }
-            }, $scope.handleHttpError);
+            var chunk = 50;
+            for (var i=0,j=messageIds.length; i<j; i+=chunk) {
+                loadMessagesSet(billingAccount, serviceName, messageIds.slice(i,i+chunk))
+            }
+        }, $scope.handleHttpError);
+    }
+
+    function loadMessagesSet(billingAccount, serviceName, messageIds) {
+        $http.get('/ovhapi/telephony/'+billingAccount+'/voicemail/'+serviceName+'/directories/'+messageIds.join(','), {headers:{'X-OVH-BATCH':','}}).then(function successCallback(response) {
+            var messages = response.data;
+            for (var i = 0; i < messages.length; i++) {
+                $scope.service['voicemails'][serviceName]['messages'][messages[i].key] = messages[i].value;
+                $scope.service['voicemails'][serviceName]['messages'][messages[i].key]['downloadCount'] = 10;
+            }
         }, $scope.handleHttpError);
     }
     
