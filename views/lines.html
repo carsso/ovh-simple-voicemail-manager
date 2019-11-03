@@ -1,7 +1,7 @@
 <tabs>
-    <pane title="{{service.description || service.billingAccount}}" ng-repeat="service in services">
+    <pane title="{{service.description || service.billingAccount}}" ng-repeat="service in services | toArray:false | orderBy:'billingAccount'">
         <ul class="list-group list-group-flush">
-            <li class="list-group-item" ng-repeat="voicemail in service.voicemails">
+            <li class="list-group-item" ng-repeat="voicemail in service.voicemails | toArray:false | orderBy:'serviceName'">
                 {{voicemail.description}} ({{voicemail.serviceName | tel}})
                 <a href="/voicemail/{{service.billingAccount}}/{{voicemail.serviceName}}" class="btn btn-primary btn-sm"><i class="fas fa-envelope"></i> Messages</a>
             </li>

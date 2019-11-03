@@ -1,7 +1,7 @@
 <a href="/voicemail/"><i class="fas fa-arrow-alt-circle-left"></i> Lines</a>
 <h1>{{service.description || service.billingAccount}}</h1>
 <tabs>
-    <pane title="{{voicemail.description}} ({{voicemail.serviceName | tel}})" ng-repeat="voicemail in service.voicemails">
+    <pane title="{{voicemail.description}} ({{voicemail.serviceName | tel}})" ng-repeat="voicemail in service.voicemails | toArray:false | orderBy:'serviceName'">
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -13,7 +13,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="message in voicemail.messages" rel="message{{message.id}}">
+                <tr ng-repeat="message in voicemail.messages | toArray:false | orderBy:'-id'" rel="message{{message.id}}">
                     <th scope="row">{{message.id}}</th>
                     <td>{{message.creationDatetime | date:'dd/MM/yyyy HH:mm' }}</td>
                     <td>{{message.caller | tel }}</td>

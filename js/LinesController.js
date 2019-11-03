@@ -13,7 +13,6 @@ myApp.controller('LinesController', function($scope, $routeParams, $http) {
                 var billingAccounts = response.data;
                 for (var i = 0; i < billingAccounts.length; i++) {
                     var billingAccount = billingAccounts[i];
-                    $scope.services[billingAccount] = {};
                     loadAccount(billingAccount);
                 }
             }, function errorCallback(response) {
