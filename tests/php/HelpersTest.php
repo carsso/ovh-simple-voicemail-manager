@@ -81,7 +81,10 @@ final class HelpersTest extends TestCase
         $this->assertSame(['hello' => 'world'], cache_get($key, 60));
         $this->assertNull(cache_get($key, 0), 'a zero TTL means never serve from cache');
 
+        // Backdating the file goes behind PHP's stat cache, which would
+        // otherwise still report the mtime from cache_put().
         touch(cache_path($key), time() - 120);
+        clearstatcache(true, cache_path($key));
         $this->assertNull(cache_get($key, 60));
 
         cache_forget($key);
