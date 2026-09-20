@@ -1,1 +1,10 @@
-.htaccess
+/.env
+/.env.*
+!/.env.example
+/data/
+/vendor/
+/.phpunit.cache/
+composer.lock
+.phpunit.result.cache
+*.swp
+.DS_Store

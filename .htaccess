@@ -1,0 +1,5 @@
+DirectoryIndex index.html
+AddDefaultCharset UTF-8
+
+# Credentials and cached recordings are not web content.
+RedirectMatch 404 ^/(\.env|data|vendor|tests)(/|$)

@@ -1,3 +1,0 @@
-[submodule "ovhapi"]
-	path = ovhapi
-	url = https://github.com/carsso/ovh-api-simple-http-wrapper.git

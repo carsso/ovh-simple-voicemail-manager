@@ -1,43 +1,147 @@
-OVH Simple Voicemail Manager
-============================
+# OVH Simple Voicemail Manager
 
-This project is a simple OVH voicemail manager to manage your messages and listen your records.
+Listen to, read, download and clean up the voicemails of your OVHcloud
+telephony lines from a single page, instead of clicking through the OVHcloud
+manager or calling your own number.
 
-_Depends on my project OVH API HTTP wrapper written in PHP : https://github.com/carsso/ovh-api-simple-http-wrapper_
+![Messages view](screenshots/messages-dark.jpg)
 
+Self-hosted, no database, no build step. The interface follows your browser for
+the language (French or English) and for light or dark:
 
-Screenshots:
+![Light theme](screenshots/messages-light.jpg)
 
-Lines view:
-![Lines view](https://user-images.githubusercontent.com/666182/36616603-aaf32398-18e4-11e8-8132-d4a52221c583.png)
+## Install
 
-Messages view:
-![Messages view](https://user-images.githubusercontent.com/666182/36616602-aaa990d4-18e4-11e8-8a2b-0eef3d51b337.png)
+You need PHP 8.2 or later, Composer, and somewhere to serve the folder from.
 
+```bash
+git clone https://github.com/carsso/ovh-simple-voicemail-manager.git
+cd ovh-simple-voicemail-manager
+composer install
+cp .env.example .env
+```
 
-How to use
-----------
+### Give it access to your lines
 
-Install the HTTP wrapper dependency : `git submodule init && git submodule update`
+Open `.env` and fill in one of the two credential sets. The app needs `GET`,
+`POST` and `DELETE` on `/telephony/*`, and nothing else.
 
-Copy the default htaccess file : `cp .htaccess-dist .htaccess`
+**An OAuth2 service account** — what OVHcloud issues today, available on the
+`ovh-eu`, `ovh-ca` and `ovh-us` endpoints. Create one under
+[API credentials](https://www.ovh.com/manager/#/dedicated/useraccount/api-credentials)
+and copy the pair:
 
-Then, go to the ovhapi folder and follow the "How to use" section from https://github.com/carsso/ovh-api-simple-http-wrapper
+```dotenv
+OVH_CLIENT_ID=
+OVH_CLIENT_SECRET=
+```
 
-/!\ Security warning /!\
-------------------------
+**Or an application token** — the older scheme, still supported and the only
+one on So you Start and Kimsufi. Generate it on
+[createToken](https://eu.api.ovh.com/createToken/) with the three rights above:
 
-This project does not provide client-side authentication or restrictions of any kind.
+```dotenv
+OVH_APPLICATION_KEY=
+OVH_APPLICATION_SECRET=
+OVH_CONSUMER_KEY=
+```
 
-This project is provided "as-is" and I decline any responsibility of any security issue with your OVH account if you choose to use it in an inappropriate/insecure way.
+Outside Europe, set `OVH_ENDPOINT` accordingly (`ovh-ca`, `ovh-us`,
+`soyoustart-eu`, `kimsufi-eu`…).
 
-License
--------
+Then check the credentials without opening a browser:
 
-BSD 3-clause "New" or "Revised" License
+```bash
+php api.php
+```
 
+It prints every line it can see, with its unread count. An error here means the
+credentials are wrong or lack a right.
 
-Note
-----
+### Run it
 
-This project is not affiliated with OVH.
+```bash
+php -S localhost:8080 router.php
+```
+
+Open <http://localhost:8080/>. Pass `router.php`: without it the built-in
+server hands out `.env` and your cached recordings as plain files.
+
+For anything beyond local use, point Apache at the folder — the shipped
+`.htaccess` sets the index and blocks `.env` and `data/`. The built-in server
+handles one request at a time, which is noticeable when a recording is being
+fetched.
+
+## Using it
+
+Each line you own is a tab, with the number of unread messages the voicemail
+reports. Messages come newest first, with the caller, when they called and how
+long they talked.
+
+| Button | What it does |
+|---|---|
+| **Play** | One message at a time. Click the progress bar to jump, or focus it and use ← →. |
+| **Transcript** | Shows the speech-to-text, when the line has the option. |
+| **Download** | Saves the recording. |
+| **Archive** | Moves the message out of the inbox without deleting it. The *Archive* tab holds them, and the same button puts one back. |
+| **Delete** | For good. It asks first. |
+
+The list refreshes itself every minute. `r` or the *Refresh* button does it
+immediately.
+
+### About the unread count
+
+OVHcloud tells the app *how many* messages are unread on a line, never *which*
+ones — so the count is shown in the header and on each tab, but no message is
+flagged individually. Playing a message here does not change that count; only
+listening from the phone does. *Archive* is the app's own way of keeping the
+inbox down to what still needs attention.
+
+## Configuration
+
+Everything lives in `.env`, and real environment variables override it. All of
+these are optional:
+
+| Variable | Default | What it does |
+|---|---|---|
+| `OVH_ENDPOINT` | `ovh-eu` | Which OVHcloud API to talk to. |
+| `BILLING_ACCOUNTS` | *(all)* | Comma-separated: only show these billing accounts. |
+| `VOICEMAILS` | *(all)* | Comma-separated: only show these lines. |
+| `AUDIO_FORMAT` | `mp3` | Also `ogg`, `wav`, `aiff`, `au`, `flac`. |
+| `AUTH_USER` / `AUTH_PASSWORD` | *(off)* | HTTP basic auth in front of the app. |
+| `LINES_TTL` | `300` | How long the line list is cached, in seconds. |
+| `MESSAGES_TTL` | `30` | Same for a line's messages. |
+| `AUDIO_TTL` | `2592000` | How long downloaded recordings are kept in `data/`. |
+| `FILE_WAIT` | `25` | How long to wait for OVHcloud to prepare a recording or transcript. |
+
+Recordings are fetched once and served from `data/` afterwards, so replaying a
+message is instant. Delete that folder whenever you want; it refills itself.
+
+## Security
+
+This app reads, archives and deletes your voicemails, and holds credentials to
+your OVHcloud account in `.env` next to it. It ships with **no authentication**.
+Set `AUTH_USER` / `AUTH_PASSWORD`, or put it behind something that
+authenticates, before exposing it anywhere — and remember that `data/` holds
+recordings of the messages people left you.
+
+Provided as-is: you are responsible for how you expose your own account.
+
+## Development
+
+```bash
+vendor/bin/phpunit   # PHP, with the OVHcloud API mocked
+npm test             # frontend helpers — node --test, nothing to install
+```
+
+Both run in GitHub Actions, PHPUnit on PHP 8.2 to 8.4. The frontend is plain ES
+modules under `assets/`: no bundler, no dependencies, edit and reload.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
+
+## Note
+
+This project is not affiliated with OVHcloud.

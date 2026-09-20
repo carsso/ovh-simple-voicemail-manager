@@ -1,0 +1,9 @@
+{
+    "name": "ovh-simple-voicemail-manager",
+    "private": true,
+    "type": "module",
+    "description": "Frontend has no build step and no dependencies; this file only marks assets/ as ES modules and runs the unit tests.",
+    "scripts": {
+        "test": "node --test \"tests/js/**/*.test.mjs\""
+    }
+}

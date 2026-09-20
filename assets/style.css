@@ -1,0 +1,446 @@
+/* ---------------------------------------------------------------------------
+   Tokens. Dark is the default; the theme is pinned on <html data-theme> by the
+   inline script in index.html so there is no flash on load.
+   --------------------------------------------------------------------------- */
+:root,
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg:        #0b0e14;
+    --surface:   #141922;
+    --surface-2: #1a202b;
+    --surface-3: #232b38;
+    --border:    #242c39;
+    --border-2:  #323c4d;
+    --text:      #e6edf7;
+    --text-2:    #b4c0d1;
+    --muted:     #7f8ba1;
+    --accent:    #55a2ff;
+    --accent-2:  #2b6fd0;
+    --new:       #3fb950;
+    --danger:    #f2564d;
+    --track:     #232b38;
+    --ring:      rgba(85, 162, 255, .45);
+    --shadow:    0 1px 2px rgba(0, 0, 0, .4), 0 10px 26px -14px rgba(0, 0, 0, .8);
+}
+
+:root[data-theme="light"] {
+    color-scheme: light;
+    --bg:        #f3f5f9;
+    --surface:   #ffffff;
+    --surface-2: #f7f9fc;
+    --surface-3: #eef1f7;
+    --border:    #e1e6ef;
+    --border-2:  #cdd5e2;
+    --text:      #16202e;
+    --text-2:    #3f4c60;
+    --muted:     #6b7789;
+    --accent:    #1f6feb;
+    --accent-2:  #1f6feb;
+    --new:       #1a7f37;
+    --danger:    #cf222e;
+    --track:     #e6eaf1;
+    --ring:      rgba(31, 111, 235, .35);
+    --shadow:    0 1px 2px rgba(16, 26, 40, .06), 0 8px 20px -12px rgba(16, 26, 40, .25);
+}
+
+* { box-sizing: border-box; }
+
+/* Our flex rules would otherwise override the UA's [hidden] display:none. */
+[hidden] { display: none !important; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+
+:where(a, button, [tabindex]):focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 6px;
+}
+
+/* ---------------------------------------------------------------------------
+   Top bar
+   --------------------------------------------------------------------------- */
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+}
+
+.topbar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    padding: 12px 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.brand {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    min-width: 0;
+}
+
+.brand h1 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 650;
+    letter-spacing: -.01em;
+}
+
+.line-title {
+    font-size: 13px;
+    color: var(--text-2);
+    font-weight: 550;
+}
+
+.summary {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    font-size: 12.5px;
+    color: var(--muted);
+}
+
+.summary .stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.summary .stat b {
+    color: var(--text-2);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.summary .stat.is-new b { color: var(--new); }
+
+.summary .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    flex: none;
+}
+
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Filter -------------------------------------------------------------------*/
+.segmented {
+    display: inline-flex;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2px;
+}
+
+.seg {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 550;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.seg.is-active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: var(--shadow);
+}
+
+/* Buttons ------------------------------------------------------------------*/
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--surface-3);
+    color: var(--text-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 11px;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 550;
+    cursor: pointer;
+}
+
+.btn:hover { background: var(--surface-2); color: var(--text); }
+.btn:disabled { opacity: .6; cursor: default; }
+.btn-icon-only { padding: 6px 8px; }
+.btn-icon { display: inline-flex; }
+
+.btn.is-busy .btn-icon { animation: spin 1s linear infinite; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .btn.is-busy .btn-icon { animation: none; }
+}
+
+/* Lines --------------------------------------------------------------------*/
+.lines {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 0 24px 10px;
+    max-width: 1100px;
+    margin: 0 auto;
+    scrollbar-width: thin;
+}
+
+.line-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    flex: none;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--muted);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 550;
+    padding: 4px 12px;
+    cursor: pointer;
+}
+
+.line-tab:hover { color: var(--text); border-color: var(--border-2); }
+
+.line-tab.is-active {
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+    color: var(--text);
+}
+
+.pill {
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--new) 22%, transparent);
+    color: var(--new);
+}
+
+/* Refresh countdown --------------------------------------------------------*/
+.refresh-track { height: 2px; background: transparent; }
+
+#refresh-progress {
+    height: 100%;
+    width: 0;
+    background: color-mix(in srgb, var(--accent) 55%, transparent);
+    transition: width .9s linear;
+}
+
+/* ---------------------------------------------------------------------------
+   Messages
+   --------------------------------------------------------------------------- */
+main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 24px 60px;
+}
+
+.messages {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.msg {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+/* A coloured rail marks the message being played in a long list. */
+.msg::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: transparent;
+}
+
+.msg.is-active::before { background: var(--accent); }
+.msg.is-active { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
+.msg.is-busy { opacity: .5; pointer-events: none; }
+
+.play {
+    flex: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid var(--border-2);
+    background: var(--surface-3);
+    color: var(--text);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+}
+
+.play:hover { background: var(--surface-2); }
+
+.msg.is-active .play {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.msg.is-loading .play { animation: pulse 1.2s ease-in-out infinite; }
+
+@keyframes pulse { 50% { opacity: .45; } }
+
+.body { flex: 1; min-width: 0; }
+
+.head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.caller {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.meta {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12.5px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Progress -----------------------------------------------------------------*/
+.track {
+    margin-top: 9px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--track);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity .15s ease;
+}
+
+.msg.is-active .track,
+.msg:hover .track { opacity: 1; }
+
+.track-fill {
+    height: 100%;
+    width: 0;
+    border-radius: inherit;
+    background: var(--accent);
+}
+
+.transcript {
+    margin: 10px 0 0;
+    padding: 10px 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--text-2);
+    white-space: pre-wrap;
+}
+
+/* Row actions --------------------------------------------------------------*/
+.row-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex: none;
+}
+
+.icon-btn {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.icon-btn:hover { background: var(--surface-3); color: var(--text); }
+.icon-btn.danger:hover { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
+
+/* ---------------------------------------------------------------------------
+   Placeholders
+   --------------------------------------------------------------------------- */
+.placeholder {
+    margin: 48px 0;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13.5px;
+}
+
+.banner {
+    margin: 0 0 16px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--danger) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
+    color: var(--text);
+    font-size: 13px;
+}
+
+/* ---------------------------------------------------------------------------
+   Narrow screens
+   --------------------------------------------------------------------------- */
+@media (max-width: 620px) {
+    .topbar-row { padding: 10px 14px; }
+    .lines { padding: 0 14px 10px; }
+    main { padding: 16px 14px 48px; }
+
+    .btn-label { display: none; }
+    .msg { gap: 10px; padding: 10px; }
+    .row-actions { flex-wrap: wrap; justify-content: flex-end; width: 72px; }
+}
